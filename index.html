@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Дурак Онлайн</title>
+    <title>Игры Онлайн</title>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -95,6 +95,47 @@
             border-color: #66bb6a;
             background: rgba(76, 175, 80, 0.1);
             box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .game-type-select {
+            margin: 30px 0;
+            padding: 20px 0;
+            border-top: 1px solid rgba(76, 175, 80, 0.3);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .game-type-select p {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-bottom: 15px;
+        }
+
+        .game-options {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .game-option {
+            padding: 12px 24px;
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid rgba(76, 175, 80, 0.5);
+            border-radius: 8px;
+            color: #4caf50;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .game-option:hover {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4caf50;
+        }
+
+        .game-option.active {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
         }
 
         .game-screen {
@@ -268,6 +309,7 @@
             user-select: none;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
             cursor: default;
+            transition: all 0.2s;
         }
 
         .card.red { color: #e63946; }
@@ -299,12 +341,17 @@
             width: 55px;
             height: 75px;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
         .hand-content .card:hover {
             transform: translateY(-8px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+        }
+
+        .hand-content .card.selected {
+            border: 3px solid #ffeb3b;
+            background: rgba(255, 235, 59, 0.1);
+            box-shadow: 0 8px 16px rgba(255, 235, 59, 0.4);
         }
 
         .hand-empty {
@@ -450,9 +497,18 @@
 
 <div id="menuScreen" class="menu-screen">
     <div class="menu-box">
-        <h1>🎰</h1>
-        <h1 style="color: white; font-size: 2.5em; margin-bottom: 10px;">ДУРАК</h1>
-        <p>Карточная игра для двоих</p>
+        <h1>🎮</h1>
+        <h1 style="color: white; font-size: 2.5em; margin-bottom: 10px;">ИГРЫ</h1>
+        <p>Карточные игры для двоих</p>
+
+        <div class="game-type-select">
+            <p>Выберите игру:</p>
+            <div class="game-options">
+                <button class="game-option active" onclick="selectGame('durak')">🃏 Дурак</button>
+                <button class="game-option" onclick="selectGame('chess')">♟️ Шахматы</button>
+            </div>
+        </div>
+
         <div class="menu-buttons">
             <button class="menu-btn primary" onclick="createGame()">🔴 Создать игру</button>
             <input id="roomInput" class="room-input" type="text" placeholder="Введите код игры">
@@ -487,15 +543,15 @@
     </div>
 
     <div class="hand-section">
-        <div class="section-title">Твои карты</div>
+        <div class="section-title">Твои карты (Кликни чтобы выбрать)</div>
         <div class="hand-content" id="hand"></div>
     </div>
 
     <div class="message-box" id="message"></div>
 
     <div class="controls">
-        <button class="btn btn-primary" id="attackBtn" onclick="playAttackCard()">🎯 Подкинуть</button>
-        <button class="btn btn-secondary" id="defendBtn" onclick="playDefendCard()">✅ Отбить</button>
+        <button class="btn btn-primary" id="attackBtn" onclick="playSelectedCard('attack')">🎯 Подкинуть выбранную</button>
+        <button class="btn btn-secondary" id="defendBtn" onclick="playSelectedCard('defend')">✅ Отбить выбранной</button>
         <button class="btn btn-secondary" id="endBtn" onclick="endTurn()">✋ Завершить ход</button>
         <button class="btn btn-secondary" id="giveupBtn" onclick="giveUp()">📥 Сдаться</button>
     </div>
@@ -510,14 +566,17 @@
 </div>
 
 <script>
-    let peer, conn, me, game;
-    let selectedCard = null;
+    let peer, conn, me, game, gameType = 'durak', selectedCardIdx = null;
 
     const SUITS = ["♠", "♥", "♦", "♣"];
     const RANKS = ["6", "7", "8", "9", "10", "В", "Д", "К", "Т"];
     const RANK_VALUE = Object.fromEntries(RANKS.map((r, i) => [r, i]));
 
-    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    function selectGame(type) {
+        gameType = type;
+        document.querySelectorAll('.game-option').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
 
     function createGame() {
         me = 0;
@@ -566,9 +625,17 @@
         document.getElementById("gameScreen").classList.add("active");
     }
 
-    // ========== ЛОГИКА ИГРЫ ==========
-
     function initGame() {
+        if (gameType === 'durak') {
+            initDurakGame();
+        } else if (gameType === 'chess') {
+            initChessGame();
+        }
+    }
+
+    // ========== ДУРАК ==========
+
+    function initDurakGame() {
         let deck = [];
         for (let s of SUITS) {
             for (let r of RANKS) {
@@ -580,6 +647,7 @@
         let trump = deck[deck.length - 1].suit;
 
         game = {
+            type: 'durak',
             deck,
             trump,
             hands: [deck.splice(0, 6), deck.splice(0, 6)],
@@ -594,15 +662,39 @@
         send();
     }
 
+    function initChessGame() {
+        game = {
+            type: 'chess',
+            board: initChessBoard(),
+            turn: 0,
+            winner: null
+        };
+        render();
+        send();
+    }
+
+    function initChessBoard() {
+        return [
+            ['♖','♘','♗','♕','♔','♗','♘','♖'],
+            ['♙','♙','♙','♙','♙','♙','♙','♙'],
+            [null,null,null,null,null,null,null,null],
+            [null,null,null,null,null,null,null,null],
+            [null,null,null,null,null,null,null,null],
+            [null,null,null,null,null,null,null,null],
+            ['♟','♟','♟','♟','♟','♟','♟','♟'],
+            ['♜','♞','♝','♛','♚','♝','♞','♜']
+        ];
+    }
+
     function handleMessage(data) {
         if (data.type === "state") {
             game = data.game;
+            selectedCardIdx = null;
             render();
         }
     }
 
     function canBeat(attacker, defender) {
-        // Бьёт, если выше по рангу И той же масти, или козырь бьёт не-козыря
         if (attacker.suit === defender.suit && RANK_VALUE[attacker.rank] > RANK_VALUE[defender.rank]) return true;
         if (attacker.suit === game.trump && defender.suit !== game.trump) return true;
         return false;
@@ -620,14 +712,31 @@
     function canAttackMore() {
         if (game.table.length >= 6) return false;
         if (game.table.length >= game.hands[game.defender].length) return false;
-
         if (game.table.length === 0) return true;
 
         let validRanks = getValidAttackRanks();
         return game.hands[game.attacker].some(c => validRanks.has(c.rank));
     }
 
-    function playAttackCard() {
+    function playSelectedCard(action) {
+        if (selectedCardIdx === null) {
+            addMessage("Выберите карту!", true);
+            return;
+        }
+
+        if (gameType === 'durak') {
+            if (action === 'attack') {
+                playDurakAttack();
+            } else if (action === 'defend') {
+                playDurakDefend();
+            }
+        }
+
+        selectedCardIdx = null;
+        render();
+    }
+
+    function playDurakAttack() {
         if (me !== game.attacker) {
             addMessage("Сейчас не ваш ход", true);
             return;
@@ -643,28 +752,24 @@
             return;
         }
 
-        let validRanks = getValidAttackRanks();
-        let validCards = game.hands[me].filter(c => 
-            game.table.length === 0 || validRanks.has(c.rank)
-        );
+        let card = game.hands[me][selectedCardIdx];
+        if (!card) return;
 
-        if (validCards.length === 0) {
-            addMessage("Нет подходящих карт", true);
+        let validRanks = getValidAttackRanks();
+        if (game.table.length > 0 && !validRanks.has(card.rank)) {
+            addMessage("Карта не совпадает по рангу!", true);
             return;
         }
 
-        // Автоматически выбираем первую подходящую карту
-        let idx = game.hands[me].indexOf(validCards[0]);
-        if (idx >= 0) {
-            game.table.push({ attack: game.hands[me][idx], defense: null });
-            game.hands[me].splice(idx, 1);
-            game.phase = "defense";
-            send();
-            render();
-        }
+        game.table.push({ attack: card, defense: null });
+        game.hands[me].splice(selectedCardIdx, 1);
+        game.phase = "defense";
+        addMessage("Карта выложена!");
+        send();
+        render();
     }
 
-    function playDefendCard() {
+    function playDurakDefend() {
         if (me !== game.defender) {
             addMessage("Вы не защищаетесь", true);
             return;
@@ -676,16 +781,18 @@
             return;
         }
 
-        let beatingCard = game.hands[me].find(c => canBeat(c, unbeaten.attack));
-        if (!beatingCard) {
-            addMessage("Нет карты для защиты", true);
+        let card = game.hands[me][selectedCardIdx];
+        if (!card) return;
+
+        if (!canBeat(card, unbeaten.attack)) {
+            addMessage("Карта не бьёт!", true);
             return;
         }
 
-        let idx = game.hands[me].indexOf(beatingCard);
-        unbeaten.defense = game.hands[me][idx];
-        game.hands[me].splice(idx, 1);
+        unbeaten.defense = card;
+        game.hands[me].splice(selectedCardIdx, 1);
         game.phase = "attack";
+        addMessage("Карта отбита!");
         send();
         render();
     }
@@ -701,7 +808,6 @@
             return;
         }
 
-        // Все карты отбиты - успешный раунд
         game.table = [];
         drawCards();
         switchRoles();
@@ -715,7 +821,6 @@
             return;
         }
 
-        // Защитник сдаётся - берёт все карты со стола
         game.table.forEach(pair => {
             game.hands[me].push(pair.attack);
             if (pair.defense) game.hands[me].push(pair.defense);
@@ -724,6 +829,7 @@
         game.table = [];
         drawCards();
         switchRoles();
+        addMessage("Вы сдались!");
         send();
         render();
     }
@@ -736,7 +842,6 @@
     }
 
     function drawCards() {
-        // Сначала рисует атакующий, потом защищающийся
         for (let p of [game.attacker, game.defender]) {
             while (game.hands[p].length < 6 && game.deck.length) {
                 game.hands[p].push(game.deck.shift());
@@ -747,7 +852,7 @@
     function checkWin() {
         for (let i = 0; i < 2; i++) {
             if (game.hands[i].length === 0 && game.deck.length === 0) {
-                game.winner = 1 - i; // Противник победил
+                game.winner = 1 - i;
                 showWinner();
             }
         }
@@ -755,14 +860,15 @@
 
     // ========== РЕНДЕРИНГ ==========
 
-    function renderCard(card, clickable = false, onclick = "") {
+    function renderCard(card, clickable = false, idx = -1) {
         if (!card) return '<div class="card-back">🂠</div>';
 
         let isRed = card.suit === "♥" || card.suit === "♦";
         let cls = isRed ? "red" : "black";
-        let click = clickable ? `onclick="${onclick}"` : "";
+        let selected = selectedCardIdx === idx ? "selected" : "";
+        let click = clickable ? `onclick="selectCard(${idx})"` : "";
 
-        return `<div class="card ${cls}" ${click} style="cursor: ${clickable ? 'pointer' : 'default'};">
+        return `<div class="card ${cls} ${selected}" ${click} style="cursor: ${clickable ? 'pointer' : 'default'};">
             <div class="card-rank">${card.rank}</div>
             <div class="card-suit">${card.suit}</div>
         </div>`;
@@ -771,7 +877,12 @@
     function render() {
         if (!game) return;
 
-        // Статус
+        if (game.type === 'durak') {
+            renderDurak();
+        }
+    }
+
+    function renderDurak() {
         if (game.winner !== null) {
             showWinner();
             return;
@@ -779,24 +890,21 @@
 
         let status = "";
         if (game.attacker === me) {
-            status = `🎯 ВАШ ХОД - подкидывайте карты`;
+            status = `🎯 ВАШ ХОД - подкидывайте карты (выберите и нажмите кнопку)`;
         } else if (game.defender === me) {
-            status = `🛡️ ЗАЩИТА - отбивайте карты`;
+            status = `🛡️ ЗАЩИТА - отбивайте карты (выберите и нажмите кнопку)`;
         } else {
             status = `⏳ Ход противника...`;
         }
         document.getElementById("status").innerHTML = status;
 
-        // Козырь и колода
         document.getElementById("trump").innerText = game.trump;
         document.getElementById("deckCount").innerText = game.deck.length;
 
-        // Противник
         document.getElementById("opponentCards").innerHTML = game.hands[1 - me]
             .map(() => renderCard(null))
             .join("");
 
-        // Стол
         if (game.table.length === 0) {
             document.getElementById("tableCards").innerHTML = '<div class="table-empty">Стол пуст</div>';
         } else {
@@ -811,16 +919,14 @@
             }).join("");
         }
 
-        // Рука
         if (game.hands[me].length === 0) {
             document.getElementById("hand").innerHTML = '<div class="hand-empty">Карт нет</div>';
         } else {
             document.getElementById("hand").innerHTML = game.hands[me]
-                .map((card, i) => renderCard(card, true, `selectCard(${i})`))
+                .map((card, i) => renderCard(card, true, i))
                 .join("");
         }
 
-        // Кнопки
         updateButtons();
     }
 
@@ -830,21 +936,21 @@
         const endBtn = document.getElementById("endBtn");
         const giveupBtn = document.getElementById("giveupBtn");
 
-        attackBtn.disabled = me !== game.attacker || game.table.some(p => !p.defense) || !canAttackMore();
-        defendBtn.disabled = me !== game.defender || !game.table.some(p => !p.defense);
+        attackBtn.disabled = me !== game.attacker || game.table.some(p => !p.defense) || !canAttackMore() || selectedCardIdx === null;
+        defendBtn.disabled = me !== game.defender || !game.table.some(p => !p.defense) || selectedCardIdx === null;
         endBtn.disabled = me !== game.attacker || game.table.some(p => !p.defense);
         giveupBtn.disabled = me !== game.defender;
     }
 
     function selectCard(idx) {
-        selectedCard = idx;
+        selectedCardIdx = selectedCardIdx === idx ? null : idx;
+        render();
     }
 
     function addMessage(msg, isError = false) {
         const box = document.getElementById("message");
         box.innerHTML = msg;
         box.classList.toggle("error", isError);
-        setTimeout(() => box.classList.remove("error"), 3000);
     }
 
     function send() {
