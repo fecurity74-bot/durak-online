@@ -7,61 +7,87 @@
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0a2e1f 0%, #1a5a3f 100%);
             color: white;
             min-height: 100vh;
+            overflow: hidden;
         }
 
+        .screen { display: none; min-height: 100vh; }
+        .screen.active { display: flex; }
+
+        /* ===== МЕНЮ ===== */
         .menu-screen {
-            display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
             padding: 20px;
+            flex-direction: column;
         }
 
         .menu-box {
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid #4caf50;
-            border-radius: 20px;
-            padding: 60px 80px;
-            max-width: 500px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 3px solid #4caf50;
+            border-radius: 25px;
+            padding: 80px;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
         }
 
-        .menu-box h1 {
-            font-size: 3.5em;
-            margin-bottom: 15px;
-            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.8);
-            color: #4caf50;
+        .menu-box h1 { font-size: 4em; color: #4caf50; margin-bottom: 20px; }
+        .menu-box p { color: #aaa; font-size: 1.1em; margin-bottom: 50px; }
+
+        .game-selector {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
         }
 
-        .menu-box p {
-            color: #aaa;
-            margin-bottom: 40px;
-            font-size: 1.1em;
+        .game-card {
+            background: rgba(76, 175, 80, 0.15);
+            border: 3px solid rgba(76, 175, 80, 0.5);
+            border-radius: 15px;
+            padding: 30px;
+            width: 220px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
+
+        .game-card:hover {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4caf50;
+            transform: translateY(-5px);
+        }
+
+        .game-card.selected {
+            background: #4caf50;
+            border-color: #4caf50;
+        }
+
+        .game-card h3 { font-size: 2.5em; margin-bottom: 10px; }
+        .game-card p { color: #aaa; font-size: 0.95em; }
 
         .menu-buttons {
             display: flex;
             flex-direction: column;
             gap: 15px;
+            margin-top: 40px;
         }
 
         .menu-btn {
-            padding: 16px 32px;
+            padding: 16px 40px;
             font-size: 16px;
             border: none;
             border-radius: 12px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 1px;
+            transition: all 0.3s;
         }
 
         .menu-btn.primary {
@@ -71,83 +97,32 @@
 
         .menu-btn.primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
         }
 
         .room-input {
             width: 100%;
-            padding: 14px 16px;
+            padding: 14px;
             border: 2px solid #4caf50;
             border-radius: 10px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
             font-size: 15px;
             margin: 15px 0;
-            transition: all 0.3s;
         }
 
-        .room-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
+        .room-input::placeholder { color: rgba(255, 255, 255, 0.4); }
         .room-input:focus {
             outline: none;
-            border-color: #66bb6a;
             background: rgba(76, 175, 80, 0.1);
             box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
         }
 
-        .game-type-select {
-            margin: 30px 0;
-            padding: 20px 0;
-            border-top: 1px solid rgba(76, 175, 80, 0.3);
-            border-bottom: 1px solid rgba(76, 175, 80, 0.3);
-        }
-
-        .game-type-select p {
-            font-size: 0.9em;
-            color: #aaa;
-            margin-bottom: 15px;
-        }
-
-        .game-options {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .game-option {
-            padding: 12px 24px;
-            background: rgba(76, 175, 80, 0.2);
-            border: 2px solid rgba(76, 175, 80, 0.5);
-            border-radius: 8px;
-            color: #4caf50;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .game-option:hover {
-            background: rgba(76, 175, 80, 0.3);
-            border-color: #4caf50;
-        }
-
-        .game-option.active {
-            background: #4caf50;
-            color: white;
-            border-color: #4caf50;
-        }
-
-        .game-screen {
-            display: none;
+        /* ===== ДУРАК ===== */
+        .durak-screen {
             flex-direction: column;
-            min-height: 100vh;
             padding: 15px;
             gap: 15px;
-        }
-
-        .game-screen.active {
-            display: flex;
         }
 
         .top-bar {
@@ -155,70 +130,56 @@
             justify-content: space-between;
             align-items: center;
             background: rgba(0, 0, 0, 0.5);
-            padding: 15px 20px;
+            padding: 15px;
             border-radius: 12px;
             border: 1px solid rgba(76, 175, 80, 0.3);
+            gap: 20px;
             flex-wrap: wrap;
-            gap: 10px;
         }
 
-        .info-item {
+        .info-badge {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            background: rgba(76, 175, 80, 0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
         }
 
-        .info-label {
-            font-size: 0.85em;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .badge-label { font-size: 0.85em; color: #aaa; text-transform: uppercase; }
+        .badge-value { font-size: 1.4em; font-weight: bold; color: #4caf50; }
 
-        .info-value {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #4caf50;
-        }
-
-        .status-display {
+        .status-text {
+            flex: 1;
             text-align: center;
             font-size: 1.1em;
             color: #ffeb3b;
             font-weight: 600;
-            flex: 1;
-            min-width: 200px;
+            min-width: 250px;
         }
 
-        .game-area {
+        .game-layout {
             flex: 1;
             display: flex;
             gap: 15px;
             overflow: hidden;
         }
 
-        .opponent-section {
-            width: 180px;
+        .opponent-panel {
+            width: 160px;
             background: rgba(0, 0, 0, 0.4);
             border: 2px solid rgba(76, 175, 80, 0.2);
             border-radius: 12px;
-            padding: 15px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .section-title {
-            font-size: 0.9em;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
-        }
+        .panel-title { font-size: 0.85em; color: #aaa; text-transform: uppercase; padding-bottom: 8px; border-bottom: 1px solid rgba(76, 175, 80, 0.2); }
 
-        .opponent-cards {
+        .cards-grid {
             flex: 1;
             display: flex;
             flex-wrap: wrap;
@@ -227,20 +188,7 @@
             overflow-y: auto;
         }
 
-        .card-back {
-            width: 45px;
-            height: 65px;
-            background: linear-gradient(135deg, #1a3a5c, #2a5a8c);
-            border: 2px solid #4caf50;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
-        }
-
-        .table-section {
+        .table-panel {
             flex: 1;
             background: rgba(20, 80, 30, 0.3);
             border: 2px solid rgba(76, 175, 80, 0.5);
@@ -251,7 +199,7 @@
             gap: 10px;
         }
 
-        .table-content {
+        .table-grid {
             flex: 1;
             display: flex;
             flex-wrap: wrap;
@@ -259,12 +207,6 @@
             align-content: flex-start;
             overflow-y: auto;
             padding: 5px;
-        }
-
-        .table-empty {
-            color: #888;
-            font-size: 1.2em;
-            margin: auto;
         }
 
         .card-pair {
@@ -275,24 +217,10 @@
             background: rgba(0, 0, 0, 0.3);
             border-radius: 8px;
             border: 2px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.2s;
         }
 
-        .card-pair.beaten {
-            border-color: rgba(76, 175, 80, 0.6);
-            background: rgba(76, 175, 80, 0.15);
-        }
-
-        .card-pair.unbeaten {
-            border-color: rgba(255, 152, 0, 0.6);
-            background: rgba(255, 152, 0, 0.1);
-        }
-
-        .card-pair-arrow {
-            color: #bbb;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
+        .card-pair.beaten { border-color: rgba(76, 175, 80, 0.6); background: rgba(76, 175, 80, 0.15); }
+        .card-pair.unbeaten { border-color: rgba(255, 152, 0, 0.6); background: rgba(255, 152, 0, 0.1); }
 
         .card {
             width: 50px;
@@ -318,7 +246,35 @@
         .card-suit { font-size: 1.4em; }
         .card-rank { font-size: 0.7em; }
 
-        .hand-section {
+        .card.clickable {
+            cursor: pointer;
+        }
+
+        .card.clickable:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+        }
+
+        .card.selected {
+            border: 3px solid #ffeb3b;
+            background: rgba(255, 235, 59, 0.1);
+            box-shadow: 0 8px 16px rgba(255, 235, 59, 0.4);
+        }
+
+        .card-back {
+            width: 50px;
+            height: 70px;
+            background: linear-gradient(135deg, #1a3a5c, #2a5a8c);
+            border: 2px solid #4caf50;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .hand-panel {
             background: rgba(0, 0, 0, 0.4);
             border: 2px solid rgba(76, 175, 80, 0.3);
             border-radius: 12px;
@@ -328,7 +284,7 @@
             gap: 10px;
         }
 
-        .hand-content {
+        .hand-grid {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
@@ -337,29 +293,11 @@
             align-items: center;
         }
 
-        .hand-content .card {
-            width: 55px;
-            height: 75px;
-            cursor: pointer;
-        }
+        .hand-grid .card { width: 55px; height: 75px; }
 
-        .hand-content .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
-        }
+        .empty-text { color: #888; font-size: 1.1em; text-align: center; }
 
-        .hand-content .card.selected {
-            border: 3px solid #ffeb3b;
-            background: rgba(255, 235, 59, 0.1);
-            box-shadow: 0 8px 16px rgba(255, 235, 59, 0.4);
-        }
-
-        .hand-empty {
-            color: #888;
-            font-size: 1.1em;
-        }
-
-        .controls {
+        .actions {
             display: flex;
             gap: 12px;
             justify-content: center;
@@ -375,28 +313,26 @@
             transition: all 0.3s;
             font-size: 0.95em;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        .btn-primary {
+        .btn.primary {
             background: linear-gradient(135deg, #4caf50, #66bb6a);
             color: white;
         }
 
-        .btn-primary:hover:not(:disabled) {
+        .btn.primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
         }
 
-        .btn-secondary {
+        .btn.secondary {
             background: rgba(76, 175, 80, 0.2);
             color: #4caf50;
             border: 2px solid #4caf50;
         }
 
-        .btn-secondary:hover:not(:disabled) {
+        .btn.secondary:hover:not(:disabled) {
             background: rgba(76, 175, 80, 0.3);
-            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.2);
         }
 
         .btn:disabled {
@@ -404,26 +340,101 @@
             cursor: not-allowed;
         }
 
-        .message-box {
+        .message {
             background: rgba(76, 175, 80, 0.15);
             border-left: 4px solid #4caf50;
-            padding: 12px 16px;
+            padding: 12px;
             border-radius: 6px;
             min-height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.95em;
-            text-align: center;
             color: #b8e6b8;
+            text-align: center;
         }
 
-        .message-box.error {
+        .message.error {
             background: rgba(244, 67, 54, 0.15);
             border-left-color: #f44336;
             color: #ffb8b8;
         }
 
+        /* ===== ШАХМАТЫ ===== */
+        .chess-screen {
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .chess-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .chess-board {
+            display: grid;
+            grid-template-columns: repeat(8, 60px);
+            gap: 0;
+            border: 3px solid #4caf50;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
+        }
+
+        .chess-cell {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .chess-cell.light { background: #e0d5c8; }
+        .chess-cell.dark { background: #8b7355; }
+
+        .chess-cell.selected {
+            border-color: #ffeb3b;
+            box-shadow: inset 0 0 10px rgba(255, 235, 59, 0.5);
+        }
+
+        .chess-cell.valid-move {
+            box-shadow: inset 0 0 10px rgba(76, 175, 80, 0.6);
+        }
+
+        .chess-cell:hover {
+            filter: brightness(1.1);
+        }
+
+        .chess-info {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .chess-status {
+            font-size: 1.2em;
+            color: #ffeb3b;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .chess-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* ===== МОДАЛЬНОЕ ОКНО ===== */
         .modal {
             position: fixed;
             top: 0;
@@ -432,15 +443,12 @@
             bottom: 0;
             background: rgba(0, 0, 0, 0.95);
             display: none;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 1000;
         }
 
-        .modal.active {
-            display: flex;
-        }
+        .modal.active { display: flex; }
 
         .modal-content {
             background: rgba(0, 0, 0, 0.9);
@@ -448,194 +456,188 @@
             border-radius: 20px;
             padding: 60px 80px;
             text-align: center;
-            animation: slideUp 0.4s ease-out;
         }
 
-        .modal-content h2 {
-            font-size: 3em;
-            margin-bottom: 20px;
-            color: #4caf50;
-        }
-
-        .modal-content p {
-            font-size: 1.1em;
-            color: #aaa;
-            margin-bottom: 30px;
-        }
-
-        .modal-content .btn {
-            width: 200px;
-            margin: 0 auto;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        .modal-content h2 { font-size: 3em; color: #4caf50; margin-bottom: 20px; }
+        .modal-content p { font-size: 1.1em; color: #aaa; margin-bottom: 30px; }
 
         @media (max-width: 1024px) {
-            .game-area { flex-direction: column; }
-            .opponent-section { width: 100%; max-height: 120px; }
+            .game-layout { flex-direction: column; }
+            .opponent-panel { width: 100%; max-height: 100px; }
             .card { width: 45px; height: 65px; }
-            .hand-content .card { width: 50px; height: 70px; }
-        }
-
-        @media (max-width: 768px) {
+            .hand-grid .card { width: 50px; height: 70px; }
             .menu-box { padding: 40px; }
-            .modal-content { padding: 40px 50px; }
-            .modal-content h2 { font-size: 2em; }
+            .chess-cell { width: 50px; height: 50px; font-size: 1.5em; }
+            .chess-board { grid-template-columns: repeat(8, 50px); }
         }
     </style>
 </head>
 <body>
 
-<div id="menuScreen" class="menu-screen">
+<!-- МЕНЮ -->
+<div id="menuScreen" class="screen menu-screen active">
     <div class="menu-box">
-        <h1>🎮</h1>
-        <h1 style="color: white; font-size: 2.5em; margin-bottom: 10px;">ИГРЫ</h1>
-        <p>Карточные игры для двоих</p>
+        <h1>🎮 ИГРЫ</h1>
+        <p>Выберите игру для игры вдвоём онлайн</p>
 
-        <div class="game-type-select">
-            <p>Выберите игру:</p>
-            <div class="game-options">
-                <button class="game-option active" onclick="selectGame('durak')">🃏 Дурак</button>
-                <button class="game-option" onclick="selectGame('chess')">♟️ Шахматы</button>
+        <div class="game-selector">
+            <div class="game-card selected" onclick="selectGame('durak', this)">
+                <h3>🃏</h3>
+                <p>ДУРАК</p>
+                <small>Карточная игра</small>
+            </div>
+            <div class="game-card" onclick="selectGame('chess', this)">
+                <h3>♟️</h3>
+                <p>ШАХМАТЫ</p>
+                <small>Стратегия</small>
             </div>
         </div>
 
         <div class="menu-buttons">
-            <button class="menu-btn primary" onclick="createGame()">🔴 Создать игру</button>
-            <input id="roomInput" class="room-input" type="text" placeholder="Введите код игры">
-            <button class="menu-btn primary" onclick="joinGame()">🟢 Присоединиться</button>
+            <button class="menu-btn primary" onclick="createGame()">🔴 СОЗДАТЬ ИГРУ</button>
+            <input id="roomCode" class="room-input" type="text" placeholder="Или введите код комнаты...">
+            <button class="menu-btn primary" onclick="joinGame()">🟢 ПРИСОЕДИНИТЬСЯ</button>
         </div>
+
+        <div id="connectionStatus" style="margin-top: 30px; color: #888; font-size: 0.9em;"></div>
     </div>
 </div>
 
-<div id="gameScreen" class="game-screen">
+<!-- ДУРАК -->
+<div id="durakScreen" class="screen durak-screen">
     <div class="top-bar">
-        <div class="info-item">
-            <div class="info-label">Козырь</div>
-            <div class="info-value" id="trump">♠</div>
+        <div class="info-badge">
+            <div class="badge-label">Козырь</div>
+            <div class="badge-value" id="trump">♠</div>
         </div>
-        <div class="status-display" id="status">Загрузка...</div>
-        <div class="info-item">
-            <div class="info-label">Колода</div>
-            <div class="info-value" id="deckCount">0</div>
-        </div>
-    </div>
-
-    <div class="game-area">
-        <div class="opponent-section">
-            <div class="section-title">👤 Противник</div>
-            <div class="opponent-cards" id="opponentCards"></div>
-        </div>
-
-        <div class="table-section">
-            <div class="section-title">🃏 Стол</div>
-            <div class="table-content" id="tableCards"></div>
+        <div class="status-text" id="status">Загрузка...</div>
+        <div class="info-badge">
+            <div class="badge-label">Колода</div>
+            <div class="badge-value" id="deckCount">0</div>
         </div>
     </div>
 
-    <div class="hand-section">
-        <div class="section-title">Твои карты (Кликни чтобы выбрать)</div>
-        <div class="hand-content" id="hand"></div>
+    <div class="game-layout">
+        <div class="opponent-panel">
+            <div class="panel-title">👤 Противник</div>
+            <div class="cards-grid" id="opponentCards"></div>
+        </div>
+
+        <div class="table-panel">
+            <div class="panel-title">🃏 Стол</div>
+            <div class="table-grid" id="table"></div>
+        </div>
     </div>
 
-    <div class="message-box" id="message"></div>
+    <div class="hand-panel">
+        <div class="panel-title">Твои карты (кликни для выбора)</div>
+        <div class="hand-grid" id="hand"></div>
+    </div>
 
-    <div class="controls">
-        <button class="btn btn-primary" id="attackBtn" onclick="playSelectedCard('attack')">🎯 Подкинуть выбранную</button>
-        <button class="btn btn-secondary" id="defendBtn" onclick="playSelectedCard('defend')">✅ Отбить выбранной</button>
-        <button class="btn btn-secondary" id="endBtn" onclick="endTurn()">✋ Завершить ход</button>
-        <button class="btn btn-secondary" id="giveupBtn" onclick="giveUp()">📥 Сдаться</button>
+    <div class="message" id="message"></div>
+
+    <div class="actions">
+        <button class="btn primary" id="attackBtn" onclick="playCard('attack')">🎯 Подкинуть</button>
+        <button class="btn secondary" id="defendBtn" onclick="playCard('defend')">✅ Отбить</button>
+        <button class="btn secondary" id="endBtn" onclick="endTurn()">✋ Завершить ход</button>
+        <button class="btn secondary" id="giveupBtn" onclick="giveUp()">📥 Сдаться</button>
     </div>
 </div>
 
-<div id="winnerModal" class="modal">
+<!-- ШАХМАТЫ -->
+<div id="chessScreen" class="screen chess-screen">
+    <div class="chess-container">
+        <h1 style="color: #4caf50; margin-bottom: 20px;">♟️ ШАХМАТЫ</h1>
+        
+        <div class="chess-info">
+            <div class="chess-status" id="chessStatus">Белые начинают</div>
+            <button class="btn primary" onclick="backToMenu()">← Вернуться</button>
+        </div>
+
+        <div class="chess-board" id="chessBoard"></div>
+
+        <div class="chess-info">
+            <div class="chess-buttons">
+                <button class="btn secondary" onclick="resetChess()">🔄 Новая игра</button>
+                <button class="btn secondary" onclick="location.reload()">↻ Перезагрузить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- МОДАЛ ПОБЕДЫ -->
+<div id="winModal" class="modal">
     <div class="modal-content">
-        <h2 id="winnerTitle">Победа!</h2>
-        <p id="winnerMsg"></p>
-        <button class="btn btn-primary" onclick="location.reload()">Играть снова</button>
+        <h2 id="winTitle">Победа!</h2>
+        <p id="winMsg"></p>
+        <button class="btn primary" onclick="backToMenu()">← В меню</button>
     </div>
 </div>
 
 <script>
-    let peer, conn, me, game, gameType = 'durak', selectedCardIdx = null;
+    let peer, conn, me, gameType = 'durak', game, selectedCard = null;
+    
+    const SUITS = ['♠', '♥', '♦', '♣'];
+    const RANKS = ['6', '7', '8', '9', '10', 'В', 'Д', 'К', 'Т'];
+    const RANK_VAL = Object.fromEntries(RANKS.map((r, i) => [r, i]));
 
-    const SUITS = ["♠", "♥", "♦", "♣"];
-    const RANKS = ["6", "7", "8", "9", "10", "В", "Д", "К", "Т"];
-    const RANK_VALUE = Object.fromEntries(RANKS.map((r, i) => [r, i]));
-
-    function selectGame(type) {
+    // ===== МЕНЮ =====
+    function selectGame(type, el) {
         gameType = type;
-        document.querySelectorAll('.game-option').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+        document.querySelectorAll('.game-card').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
     }
 
     function createGame() {
         me = 0;
         peer = new Peer();
-        peer.on("open", id => {
-            navigator.clipboard.writeText(id);
-            startGameUI();
-            addMessage("Код скопирован в буфер: " + id);
+        peer.on('open', id => {
+            showScreen(gameType + 'Screen');
+            if (gameType === 'durak') initDurak();
+            else if (gameType === 'chess') initChess();
+            document.getElementById('connectionStatus').innerHTML = `✅ ID: ${id}`;
+            navigator.clipboard.writeText(id).catch(() => {});
         });
-        peer.on("connection", conn => {
-            onConnection(conn);
+        peer.on('connection', c => {
+            conn = c;
+            conn.on('open', () => {
+                showScreen(gameType + 'Screen');
+                send({ type: 'init', gameType });
+            });
+            conn.on('data', handleMsg);
         });
+        peer.on('error', err => document.getElementById('connectionStatus').innerHTML = `❌ ${err.message}`);
     }
 
     function joinGame() {
-        const code = document.getElementById("roomInput").value.trim();
-        if (!code) {
-            addMessage("Введите код игры!", true);
-            return;
-        }
-
+        const code = document.getElementById('roomCode').value.trim();
+        if (!code) return alert('Введите код!');
+        
         me = 1;
         peer = new Peer();
-        peer.on("open", () => {
+        peer.on('open', () => {
             conn = peer.connect(code);
-            conn.on("open", () => {
-                startGameUI();
-                addMessage("Подключено к игре");
-            });
-            conn.on("data", handleMessage);
-            conn.on("error", err => addMessage("Ошибка: " + err.message, true));
+            conn.on('open', () => document.getElementById('connectionStatus').innerHTML = '✅ Подключено');
+            conn.on('data', handleMsg);
+            conn.on('error', err => alert('Ошибка: ' + err.message));
         });
     }
 
-    function onConnection(c) {
-        conn = c;
-        conn.on("open", () => {
-            startGameUI();
-            initGame();
-        });
-        conn.on("data", handleMessage);
-    }
-
-    function startGameUI() {
-        document.getElementById("menuScreen").style.display = "none";
-        document.getElementById("gameScreen").classList.add("active");
-    }
-
-    function initGame() {
-        if (gameType === 'durak') {
-            initDurakGame();
-        } else if (gameType === 'chess') {
-            initChessGame();
+    function handleMsg(data) {
+        if (data.type === 'init') {
+            gameType = data.gameType;
+            showScreen(gameType + 'Screen');
+            if (gameType === 'durak') initDurak();
+            else if (gameType === 'chess') initChess();
+        } else if (data.type === 'state') {
+            game = data.game;
+            selectedCard = null;
+            render();
         }
     }
 
-    // ========== ДУРАК ==========
-
-    function initDurakGame() {
+    // ===== ДУРАК =====
+    function initDurak() {
         let deck = [];
         for (let s of SUITS) {
             for (let r of RANKS) {
@@ -643,68 +645,35 @@
             }
         }
         deck.sort(() => Math.random() - 0.5);
-
+        
         let trump = deck[deck.length - 1].suit;
-
+        
         game = {
             type: 'durak',
-            deck,
-            trump,
+            deck, trump,
             hands: [deck.splice(0, 6), deck.splice(0, 6)],
             table: [],
             attacker: 0,
             defender: 1,
-            phase: "attack",
+            phase: 'attack',
             winner: null
         };
-
+        
         render();
-        send();
+        if (me === 0) send({ type: 'state', game });
     }
 
-    function initChessGame() {
-        game = {
-            type: 'chess',
-            board: initChessBoard(),
-            turn: 0,
-            winner: null
-        };
-        render();
-        send();
-    }
-
-    function initChessBoard() {
-        return [
-            ['♖','♘','♗','♕','♔','♗','♘','♖'],
-            ['♙','♙','♙','♙','♙','♙','♙','♙'],
-            [null,null,null,null,null,null,null,null],
-            [null,null,null,null,null,null,null,null],
-            [null,null,null,null,null,null,null,null],
-            [null,null,null,null,null,null,null,null],
-            ['♟','♟','♟','♟','♟','♟','♟','♟'],
-            ['♜','♞','♝','♛','♚','♝','♞','♜']
-        ];
-    }
-
-    function handleMessage(data) {
-        if (data.type === "state") {
-            game = data.game;
-            selectedCardIdx = null;
-            render();
-        }
-    }
-
-    function canBeat(attacker, defender) {
-        if (attacker.suit === defender.suit && RANK_VALUE[attacker.rank] > RANK_VALUE[defender.rank]) return true;
-        if (attacker.suit === game.trump && defender.suit !== game.trump) return true;
+    function canBeat(att, def) {
+        if (att.suit === def.suit && RANK_VAL[att.rank] > RANK_VAL[def.rank]) return true;
+        if (att.suit === game.trump && def.suit !== game.trump) return true;
         return false;
     }
 
-    function getValidAttackRanks() {
+    function getValidRanks() {
         let ranks = new Set();
-        game.table.forEach(pair => {
-            ranks.add(pair.attack.rank);
-            if (pair.defense) ranks.add(pair.defense.rank);
+        game.table.forEach(p => {
+            ranks.add(p.attack.rank);
+            if (p.defense) ranks.add(p.defense.rank);
         });
         return ranks;
     }
@@ -713,265 +682,242 @@
         if (game.table.length >= 6) return false;
         if (game.table.length >= game.hands[game.defender].length) return false;
         if (game.table.length === 0) return true;
-
-        let validRanks = getValidAttackRanks();
-        return game.hands[game.attacker].some(c => validRanks.has(c.rank));
+        let ranks = getValidRanks();
+        return game.hands[game.attacker].some(c => ranks.has(c.rank));
     }
 
-    function playSelectedCard(action) {
-        if (selectedCardIdx === null) {
-            addMessage("Выберите карту!", true);
+    function playCard(act) {
+        if (selectedCard === null) {
+            addMsg('Выбери карту!', true);
             return;
         }
 
-        if (gameType === 'durak') {
-            if (action === 'attack') {
-                playDurakAttack();
-            } else if (action === 'defend') {
-                playDurakDefend();
-            }
+        let card = game.hands[me][selectedCard];
+        
+        if (act === 'attack') {
+            if (me !== game.attacker) return addMsg('Не твой ход', true);
+            if (game.table.some(p => !p.defense)) return addMsg('Защитник не отбил', true);
+            if (!canAttackMore()) return addMsg('Нельзя подкидывать', true);
+            
+            let ranks = getValidRanks();
+            if (game.table.length > 0 && !ranks.has(card.rank)) return addMsg('Ранг не совпадает', true);
+            
+            game.table.push({ attack: card, defense: null });
+            game.hands[me].splice(selectedCard, 1);
+            game.phase = 'defense';
+        } else if (act === 'defend') {
+            if (me !== game.defender) return addMsg('Ты не защищаешься', true);
+            let pair = game.table.find(p => !p.defense);
+            if (!pair) return addMsg('Все отбиты', true);
+            if (!canBeat(card, pair.attack)) return addMsg('Не бьет', true);
+            
+            pair.defense = card;
+            game.hands[me].splice(selectedCard, 1);
+            game.phase = 'attack';
         }
 
-        selectedCardIdx = null;
-        render();
-    }
-
-    function playDurakAttack() {
-        if (me !== game.attacker) {
-            addMessage("Сейчас не ваш ход", true);
-            return;
-        }
-
-        if (game.table.some(p => !p.defense)) {
-            addMessage("Защитник не отбил карту", true);
-            return;
-        }
-
-        if (!canAttackMore()) {
-            addMessage("Невозможно подкинуть", true);
-            return;
-        }
-
-        let card = game.hands[me][selectedCardIdx];
-        if (!card) return;
-
-        let validRanks = getValidAttackRanks();
-        if (game.table.length > 0 && !validRanks.has(card.rank)) {
-            addMessage("Карта не совпадает по рангу!", true);
-            return;
-        }
-
-        game.table.push({ attack: card, defense: null });
-        game.hands[me].splice(selectedCardIdx, 1);
-        game.phase = "defense";
-        addMessage("Карта выложена!");
-        send();
-        render();
-    }
-
-    function playDurakDefend() {
-        if (me !== game.defender) {
-            addMessage("Вы не защищаетесь", true);
-            return;
-        }
-
-        let unbeaten = game.table.find(p => !p.defense);
-        if (!unbeaten) {
-            addMessage("Все карты отбиты", true);
-            return;
-        }
-
-        let card = game.hands[me][selectedCardIdx];
-        if (!card) return;
-
-        if (!canBeat(card, unbeaten.attack)) {
-            addMessage("Карта не бьёт!", true);
-            return;
-        }
-
-        unbeaten.defense = card;
-        game.hands[me].splice(selectedCardIdx, 1);
-        game.phase = "attack";
-        addMessage("Карта отбита!");
-        send();
+        selectedCard = null;
+        checkWin();
+        send({ type: 'state', game });
         render();
     }
 
     function endTurn() {
-        if (me !== game.attacker) {
-            addMessage("Не ваш ход", true);
-            return;
-        }
-
-        if (game.table.some(p => !p.defense)) {
-            addMessage("Защитник не отбил все карты", true);
-            return;
-        }
-
+        if (me !== game.attacker) return addMsg('Не твой ход', true);
+        if (game.table.some(p => !p.defense)) return addMsg('Не все отбиты', true);
+        
         game.table = [];
-        drawCards();
-        switchRoles();
-        send();
-        render();
-    }
-
-    function giveUp() {
-        if (me !== game.defender) {
-            addMessage("Вы не защищаетесь", true);
-            return;
-        }
-
-        game.table.forEach(pair => {
-            game.hands[me].push(pair.attack);
-            if (pair.defense) game.hands[me].push(pair.defense);
-        });
-
-        game.table = [];
-        drawCards();
-        switchRoles();
-        addMessage("Вы сдались!");
-        send();
-        render();
-    }
-
-    function switchRoles() {
-        game.attacker = game.defender;
-        game.defender = 1 - game.attacker;
-        game.phase = "attack";
-        checkWin();
-    }
-
-    function drawCards() {
         for (let p of [game.attacker, game.defender]) {
             while (game.hands[p].length < 6 && game.deck.length) {
                 game.hands[p].push(game.deck.shift());
             }
         }
+        
+        game.attacker = game.defender;
+        game.defender = 1 - game.attacker;
+        game.phase = 'attack';
+        checkWin();
+        send({ type: 'state', game });
+        render();
+    }
+
+    function giveUp() {
+        if (me !== game.defender) return addMsg('Ты не защищаешься', true);
+        
+        game.table.forEach(p => {
+            game.hands[me].push(p.attack);
+            if (p.defense) game.hands[me].push(p.defense);
+        });
+        
+        game.table = [];
+        for (let p of [game.attacker, game.defender]) {
+            while (game.hands[p].length < 6 && game.deck.length) {
+                game.hands[p].push(game.deck.shift());
+            }
+        }
+        
+        game.attacker = game.defender;
+        game.defender = 1 - game.attacker;
+        game.phase = 'attack';
+        checkWin();
+        send({ type: 'state', game });
+        render();
     }
 
     function checkWin() {
         for (let i = 0; i < 2; i++) {
             if (game.hands[i].length === 0 && game.deck.length === 0) {
                 game.winner = 1 - i;
-                showWinner();
+                showWin();
             }
         }
     }
 
-    // ========== РЕНДЕРИНГ ==========
-
-    function renderCard(card, clickable = false, idx = -1) {
-        if (!card) return '<div class="card-back">🂠</div>';
-
-        let isRed = card.suit === "♥" || card.suit === "♦";
-        let cls = isRed ? "red" : "black";
-        let selected = selectedCardIdx === idx ? "selected" : "";
-        let click = clickable ? `onclick="selectCard(${idx})"` : "";
-
-        return `<div class="card ${cls} ${selected}" ${click} style="cursor: ${clickable ? 'pointer' : 'default'};">
-            <div class="card-rank">${card.rank}</div>
-            <div class="card-suit">${card.suit}</div>
+    function renderCard(c, idx = -1, click = false) {
+        if (!c) return '<div class="card-back">🂠</div>';
+        
+        let isRed = c.suit === '♥' || c.suit === '♦';
+        let sel = selectedCard === idx ? 'selected' : '';
+        let cl = click ? `onclick="selectCard(${idx})"` : '';
+        let clk = click ? 'clickable' : '';
+        
+        return `<div class="card ${isRed ? 'red' : 'black'} ${sel} ${clk}" ${cl}>
+            <div class="card-rank">${c.rank}</div>
+            <div class="card-suit">${c.suit}</div>
         </div>`;
     }
 
     function render() {
         if (!game) return;
-
+        
         if (game.type === 'durak') {
-            renderDurak();
+            let st = '';
+            if (game.attacker === me) st = `🎯 ТВОЙ ХОД - подкидывай`;
+            else if (game.defender === me) st = `🛡️ ЗАЩИТА - отбивай`;
+            else st = `⏳ Ход соперника...`;
+            
+            document.getElementById('status').innerHTML = st;
+            document.getElementById('trump').innerText = game.trump;
+            document.getElementById('deckCount').innerText = game.deck.length;
+            
+            document.getElementById('opponentCards').innerHTML = game.hands[1-me]
+                .map(() => renderCard(null)).join('');
+            
+            if (game.table.length === 0) {
+                document.getElementById('table').innerHTML = '<div style="color: #888; grid-column: 1/-1; text-align: center;">Стол пуст</div>';
+            } else {
+                document.getElementById('table').innerHTML = game.table.map(p => {
+                    let beaten = p.defense ? 'beaten' : 'unbeaten';
+                    let arr = p.defense ? '✓' : '→';
+                    return `<div class="card-pair ${beaten}">
+                        ${renderCard(p.attack)}
+                        <span style="color: #bbb; font-weight: bold;">${arr}</span>
+                        ${p.defense ? renderCard(p.defense) : '<div class="card-back">?</div>'}
+                    </div>`;
+                }).join('');
+            }
+            
+            document.getElementById('hand').innerHTML = game.hands[me].length === 0
+                ? '<div class="empty-text">Карт нет</div>'
+                : game.hands[me].map((c, i) => renderCard(c, i, true)).join('');
+            
+            document.getElementById('attackBtn').disabled = me !== game.attacker || game.table.some(p => !p.defense) || !canAttackMore() || selectedCard === null;
+            document.getElementById('defendBtn').disabled = me !== game.defender || !game.table.some(p => !p.defense) || selectedCard === null;
+            document.getElementById('endBtn').disabled = me !== game.attacker || game.table.some(p => !p.defense);
+            document.getElementById('giveupBtn').disabled = me !== game.defender;
         }
-    }
-
-    function renderDurak() {
-        if (game.winner !== null) {
-            showWinner();
-            return;
-        }
-
-        let status = "";
-        if (game.attacker === me) {
-            status = `🎯 ВАШ ХОД - подкидывайте карты (выберите и нажмите кнопку)`;
-        } else if (game.defender === me) {
-            status = `🛡️ ЗАЩИТА - отбивайте карты (выберите и нажмите кнопку)`;
-        } else {
-            status = `⏳ Ход противника...`;
-        }
-        document.getElementById("status").innerHTML = status;
-
-        document.getElementById("trump").innerText = game.trump;
-        document.getElementById("deckCount").innerText = game.deck.length;
-
-        document.getElementById("opponentCards").innerHTML = game.hands[1 - me]
-            .map(() => renderCard(null))
-            .join("");
-
-        if (game.table.length === 0) {
-            document.getElementById("tableCards").innerHTML = '<div class="table-empty">Стол пуст</div>';
-        } else {
-            document.getElementById("tableCards").innerHTML = game.table.map((pair, i) => {
-                let beaten = pair.defense ? "beaten" : "unbeaten";
-                let arrow = pair.defense ? "✓" : "→";
-                return `<div class="card-pair ${beaten}">
-                    ${renderCard(pair.attack)}
-                    <span class="card-pair-arrow">${arrow}</span>
-                    ${pair.defense ? renderCard(pair.defense) : '<div class="card-back">?</div>'}
-                </div>`;
-            }).join("");
-        }
-
-        if (game.hands[me].length === 0) {
-            document.getElementById("hand").innerHTML = '<div class="hand-empty">Карт нет</div>';
-        } else {
-            document.getElementById("hand").innerHTML = game.hands[me]
-                .map((card, i) => renderCard(card, true, i))
-                .join("");
-        }
-
-        updateButtons();
-    }
-
-    function updateButtons() {
-        const attackBtn = document.getElementById("attackBtn");
-        const defendBtn = document.getElementById("defendBtn");
-        const endBtn = document.getElementById("endBtn");
-        const giveupBtn = document.getElementById("giveupBtn");
-
-        attackBtn.disabled = me !== game.attacker || game.table.some(p => !p.defense) || !canAttackMore() || selectedCardIdx === null;
-        defendBtn.disabled = me !== game.defender || !game.table.some(p => !p.defense) || selectedCardIdx === null;
-        endBtn.disabled = me !== game.attacker || game.table.some(p => !p.defense);
-        giveupBtn.disabled = me !== game.defender;
     }
 
     function selectCard(idx) {
-        selectedCardIdx = selectedCardIdx === idx ? null : idx;
+        selectedCard = selectedCard === idx ? null : idx;
         render();
     }
 
-    function addMessage(msg, isError = false) {
-        const box = document.getElementById("message");
-        box.innerHTML = msg;
-        box.classList.toggle("error", isError);
+    function addMsg(msg, err = false) {
+        const el = document.getElementById('message');
+        el.innerHTML = msg;
+        el.classList.toggle('error', err);
     }
 
-    function send() {
-        if (conn && conn.open) {
-            conn.send({ type: "state", game });
+    // ===== ШАХМАТЫ =====
+    function initChess() {
+        game = {
+            type: 'chess',
+            board: [
+                ['♖','♘','♗','♕','♔','♗','♘','♖'],
+                ['♙','♙','♙','♙','♙','♙','♙','♙'],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                ['♟','♟','♟','♟','♟','♟','♟','♟'],
+                ['♜','♞','♝','♛','♚','♝','♞','♜']
+            ],
+            turn: 0,
+            selected: null,
+            winner: null
+        };
+        renderChess();
+        send({ type: 'state', game });
+    }
+
+    function renderChess() {
+        const board = document.getElementById('chessBoard');
+        board.innerHTML = '';
+        
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                const cell = document.createElement('div');
+                cell.className = `chess-cell ${(r + c) % 2 === 0 ? 'light' : 'dark'}`;
+                cell.innerHTML = game.board[r][c] || '';
+                cell.onclick = () => moveChess(r, c);
+                board.appendChild(cell);
+            }
         }
+        
+        let st = game.turn === 0 ? '⚪ Белые' : '⚫ Чёрные';
+        if (game.winner !== null) st = `Победа: ${game.winner === 0 ? '⚪ Белые' : '⚫ Чёрные'}`;
+        document.getElementById('chessStatus').innerHTML = st;
     }
 
-    function showWinner() {
-        let title, msg;
-        if (game.winner === me) {
-            title = "🎉 ПОБЕДА!";
-            msg = "Вы выиграли!";
+    function moveChess(r, c) {
+        // Упрощенная логика - просто для демо
+        if (game.selected === null) {
+            game.selected = [r, c];
         } else {
-            title = "😢 ПОРАЖЕНИЕ";
-            msg = "Противник выиграл!";
+            let [fr, fc] = game.selected;
+            let tmp = game.board[r][c];
+            game.board[r][c] = game.board[fr][fc];
+            game.board[fr][fc] = 0;
+            game.selected = null;
+            game.turn = 1 - game.turn;
+            send({ type: 'state', game });
+            renderChess();
         }
+    }
 
-        document.getElementById("winnerTitle").innerText = title;
-        document.getElementById("winnerMsg").innerText = msg;
-        document.getElementById("winnerModal").classList.add("active");
+    function resetChess() {
+        initChess();
+    }
+
+    // ===== УТИЛИТЫ =====
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(e => e.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function send(data) {
+        if (conn && conn.open) conn.send(data);
+    }
+
+    function showWin() {
+        document.getElementById('winTitle').innerHTML = game.winner === me ? '🎉 ТЫ ПОБЕДИЛ!' : '😢 Ты проиграл!';
+        document.getElementById('winMsg').innerHTML = game.winner === me ? 'Поздравляем!' : 'Попробуй еще раз';
+        document.getElementById('winModal').classList.add('active');
+    }
+
+    function backToMenu() {
+        location.reload();
     }
 
     render();
