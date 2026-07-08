@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Дурак онлайн</title>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+body{font-family:Arial;background:#087a2a;color:white;text-align:center}
+.card{display:inline-block;background:white;color:black;border-radius:8px;
+padding:18px 12px;margin:5px;cursor:pointer;font-size:24px;min-width:45px}
+.red{color:red}.table{border:2px dashed white;margin:20px;padding:20px;min-height:100px}
+button,input{font-size:18px;padding:10px;margin:5px}
+</style>
+</head>
+<body>
+
+<h1>Дурак онлайн</h1>
+
+<div id="menu">
+  <button onclick="host()">Создать комнату</button><br>
+  <input id="room" placeholder="Код комнаты">
+  <button onclick="join()">Подключиться</button>
+</div>
+
+<h2 id="status"></h2>
+<p id="trump"></p>
+
+<div class="table" id="table"></div>
+
+<h2>Твои карты</h2>
+<div id="hand"></div>
+
+<button onclick="take()">Взять</button>
+<button onclick="done()">Бито / конец хода</button>
+
+<script>
+let peer, conn, me, game;
+
+const suits=["♠","♥","♦","♣"];
+const vals=["6","7","8","9","10","В","Д","К","Т"];
+const rank=Object.fromEntries(vals.map((v,i)=>[v,i]));
+
+function cardHTML(c,i){
+  let red=c.s=="♥"||c.s=="♦"?"red":"";
+  return `<span class="card ${red}" onclick="play(${i})">${c.v}${c.s}</span>`;
+}
+
+function host(){
+  me=0;
+  peer=new Peer();
+  peer.on("open",id=>{
+    document.getElementById("status").innerText="Код комнаты: "+id;
+  });
+  peer.on("connection",c=>{
+    conn=c;
+    conn.on("open",()=>{
+      newGame();
+      send();
+    });
+    conn.on("data",data=>{
+      if(data.type==="play") playerMove(1,data.index);
+      if(data.type==="take") playerTake(1);
+      if(data.type==="done") endTurn();
+    });
+  });
+}
+
+function join(){
+  me=1;
+  peer=new Peer();
+  peer.on("open",()=>{
+    conn=peer.connect(document.getElementById("room").value);
+    conn.on("data",data=>{
+      if(data.type==="state"){game=data.game;render();}
+    });
+    conn.on("open",()=>{
+      document.getElementById("status").innerText="Подключено!";
+    });
+  });
+}
+
+function newGame(){
+  let deck=[];
+  for(let s of suits) for(let v of vals) deck.push({s,v});
+  deck.sort(()=>Math.random()-0.5);
+
+  let trump=deck[deck.length-1].s;
+
+  game={
+    deck,
+    trump,
+    hands:[deck.splice(0,6),deck.splice(0,6)],
+    table:[],
+    turn:0,
+    defender:1,
+    phase:"attack",
+    winner:null
+  };
+}
+
+function beats(a,b){
+  if(a.s===b.s && rank[a.v]>rank[b.v]) return true;
+  if(a.s===game.trump && b.s!==game.trump) return true;
+  return false;
+}
+
+function playerMove(p,i){
+  if(game.winner!==null)return;
+  if(p!==game.turn && p!==game.defender)return;
+
+  let card=game.hands[p][i];
+
+  if(game.phase==="attack" && p===game.turn){
+    game.hands[p].splice(i,1);
+    game.table.push({attack:card,defense:null});
+    game.phase="defense";
+  } 
+  else if(game.phase==="defense" && p===game.defender){
+    let pair=game.table.find(x=>!x.defense);
+    if(pair && beats(card,pair.attack)){
+      game.hands[p].splice(i,1);
+      pair.defense=card;
+      game.phase="attack";
+    } else {
+      alert("Эта карта не бьёт!");
+    }
+  }
+
+  checkWin();
+  send();
+  render();
+}
+
+function play(i){
+  if(me===0) playerMove(0,i);
+  else conn.send({type:"play",index:i});
+}
+
+function playerTake(p){
+  if(p!==game.defender)return;
+
+  game.table.forEach(x=>{
+    game.hands[p].push(x.attack);
+    if(x.defense) game.hands[p].push(x.defense);
+  });
+
+  game.table=[];
+  drawCards();
+  game.turn = 1 - game.turn;
+  game.defender = 1 - game.turn;
+  game.phase="attack";
+
+  send();
+  render();
+}
+
+function take(){
+  if(me===0) playerTake(0);
+  else conn.send({type:"take"});
+}
+
+function done(){
+  if(me===0) endTurn();
+  else conn.send({type:"done"});
+}
+
+function endTurn(){
+  if(game.table.some(x=>!x.defense))return alert("Не все карты отбиты!");
+
+  game.table=[];
+  drawCards();
+
+  game.turn=game.defender;
+  game.defender=1-game.turn;
+  game.phase="attack";
+
+  checkWin();
+  send();
+  render();
+}
+
+function drawCards(){
+  for(let p of [game.turn,game.defender]){
+    while(game.hands[p].length<6 && game.deck.length){
+      game.hands[p].push(game.deck.shift());
+    }
+  }
+}
+
+function checkWin(){
+  for(let p=0;p<2;p++){
+    if(game.hands[p].length===0 && game.deck.length===0){
+      game.winner=p;
+    }
+  }
+}
+
+function send(){
+  if(conn && conn.open) conn.send({type:"state",game});
+}
+
+function render(){
+  document.getElementById("menu").style.display="none";
+
+  if(!game)return;
+
+  if(game.winner!==null){
+    document.getElementById("status").innerText=
+      game.winner===me ? "Ты победил!" : "Ты проиграл!";
+  } else {
+    document.getElementById("status").innerText=
+      game.turn===me ? "Твой ход" :
+      game.defender===me ? "Ты отбиваешься" :
+      "Ход друга";
+  }
+
+  document.getElementById("trump").innerText=
+    "Козырь: "+game.trump+" | Карт в колоде: "+game.deck.length;
+
+  document.getElementById("hand").innerHTML=
+    game.hands[me].map(cardHTML).join("");
+
+  document.getElementById("table").innerHTML=
+    game.table.map(x=>{
+      let a=`${x.attack.v}${x.attack.s}`;
+      let d=x.defense?`${x.defense.v}${x.defense.s}`:"?";
+      return `<div>${a} → ${d}</div>`;
+    }).join("") || "Стол пуст";
+}
+</script>
+
+</body>
+</html>
