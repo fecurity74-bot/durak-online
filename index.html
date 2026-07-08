@@ -14,7 +14,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0d5c2e 0%, #1a7a3f 100%);
+            background: linear-gradient(135deg, #0a3d1f 0%, #145a2a 100%);
             color: white;
             min-height: 100vh;
             display: flex;
@@ -22,83 +22,82 @@
             padding: 10px;
         }
 
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            gap: 10px;
+        }
+
         .header {
             text-align: center;
-            padding: 15px 0;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 15px;
+            padding: 10px;
         }
 
         h1 {
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            margin-bottom: 5px;
+            font-size: 2em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         }
 
         #status {
-            font-size: 1.1em;
+            font-size: 1em;
             color: #ffd700;
-        }
-
-        #trump {
-            font-size: 0.95em;
-            color: #b0e0e6;
+            margin-top: 5px;
         }
 
         .menu-container {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.5);
             border-radius: 15px;
             padding: 30px;
             max-width: 400px;
-            margin: 0 auto;
+            margin: 50px auto;
             border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
         .menu-container h2 {
             margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-
-        .input-group {
-            margin: 15px 0;
         }
 
         input[type="text"] {
             width: 100%;
-            padding: 12px;
-            font-size: 16px;
+            padding: 10px;
+            margin-bottom: 10px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
-            margin-bottom: 10px;
+            font-size: 14px;
         }
 
-        input[type="text"]::placeholder {
+        input::placeholder {
             color: rgba(255, 255, 255, 0.5);
         }
 
         button {
             width: 100%;
-            padding: 12px;
-            font-size: 16px;
+            padding: 10px;
+            font-size: 14px;
             border: none;
             border-radius: 8px;
             background: linear-gradient(135deg, #ffd700, #ffed4e);
             color: #000;
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.3s;
-            margin: 10px 0;
+            transition: all 0.2s;
+            margin: 8px 0;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
         }
 
-        button:active {
-            transform: translateY(0);
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         button.secondary {
@@ -107,71 +106,157 @@
             color: white;
         }
 
-        button.secondary:hover {
+        button.secondary:hover:not(:disabled) {
             background: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
         }
 
-        .game-area {
+        .game-container {
             display: none;
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
+            overflow: hidden;
         }
 
-        .game-area.active {
+        .game-container.active {
             display: flex;
         }
 
-        .table-area {
+        .game-top {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-badge {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            border-left: 4px solid #ffd700;
+        }
+
+        .deck-info {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .main-content {
             flex: 1;
+            display: flex;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .opponent-area {
+            flex: 0.25;
             background: rgba(0, 0, 0, 0.3);
-            border: 3px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            padding: 20px;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .opponent-title {
+            font-size: 0.9em;
+            color: #b0e0e6;
+            font-weight: bold;
+        }
+
+        .opponent-cards {
+            flex: 1;
             display: flex;
             flex-wrap: wrap;
+            gap: 5px;
             align-content: flex-start;
-            gap: 15px;
-            min-height: 200px;
             overflow-y: auto;
+        }
+
+        .card-back {
+            width: 45px;
+            height: 65px;
+            background: linear-gradient(135deg, #1a1a5c, #4a4a8a);
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .table-container {
+            flex: 1;
+            background: rgba(0, 100, 0, 0.2);
+            border: 3px solid rgba(0, 255, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .table-title {
+            font-size: 0.9em;
+            color: #b0e0e6;
+            margin-bottom: 5px;
+        }
+
+        .table-cards {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-content: flex-start;
+            overflow-y: auto;
+            padding: 5px;
         }
 
         .card-pair {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .card-pair.beaten {
+            border-color: rgba(76, 175, 80, 0.6);
+            background: rgba(76, 175, 80, 0.15);
         }
 
         .card {
-            width: 70px;
-            height: 100px;
+            width: 50px;
+            height: 72px;
             background: white;
-            border-radius: 8px;
-            padding: 5px;
+            border-radius: 6px;
+            padding: 3px;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
             font-weight: bold;
+            font-size: 0.85em;
             user-select: none;
             position: relative;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
             transition: all 0.2s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-        }
-
-        .card:active {
             transform: translateY(-4px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
         }
 
         .card.red {
@@ -182,243 +267,291 @@
             color: #1a1a1a;
         }
 
-        .card-rank {
-            font-size: 18px;
+        .card-back-table {
+            width: 50px;
+            height: 72px;
+            background: linear-gradient(135deg, #1a1a5c, #4a4a8a);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
         }
 
         .card-suit {
-            font-size: 20px;
+            font-size: 1.2em;
         }
 
         .card-corner {
-            position: absolute;
-            font-size: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            font-size: 0.6em;
             line-height: 1;
         }
 
-        .card-corner.top-left {
-            top: 2px;
-            left: 2px;
-        }
-
-        .card-corner.bottom-right {
-            bottom: 2px;
-            right: 2px;
-            transform: rotate(180deg);
-        }
-
-        .hand-area {
+        .hand-container {
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 10px;
             display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            min-height: 120px;
-            align-content: center;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        .hand-area .card {
-            width: 60px;
-            height: 90px;
+        .hand-title {
+            font-size: 0.9em;
+            color: #b0e0e6;
+            font-weight: bold;
         }
 
-        .controls {
+        .hand-cards {
             display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .controls button {
-            flex: 1;
-            min-width: 150px;
-            max-width: 200px;
-        }
-
-        .info-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 0.95em;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: center;
             gap: 8px;
-            padding: 8px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            min-height: 80px;
+            align-items: center;
         }
 
-        .deck-count {
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-weight: bold;
+        .hand-cards .card {
+            width: 55px;
+            height: 80px;
+            font-size: 0.9em;
         }
 
-        .trump-display {
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-            color: #000;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-weight: bold;
+        .hand-cards .card:hover {
+            transform: translateY(-8px);
         }
 
-        .animation-card {
-            animation: cardFly 0.6s ease-out;
+        .control-panel {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
-        @keyframes cardFly {
-            from {
-                opacity: 0;
-                transform: scale(0.5) translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+        .control-panel button {
+            flex: 0 1 auto;
+            min-width: 120px;
+            padding: 8px 12px;
+            font-size: 13px;
         }
 
-        .message {
+        .status-message {
             text-align: center;
-            padding: 20px;
-            font-size: 1.3em;
+            padding: 8px 15px;
+            background: rgba(255, 215, 0, 0.15);
+            border-left: 4px solid #ffd700;
+            border-radius: 8px;
             font-weight: bold;
-            color: #ffd700;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            color: #ffeb99;
         }
 
-        .winner-message {
+        .game-log {
+            max-height: 80px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            color: #b0e0e6;
+        }
+
+        .log-entry {
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .winner-modal {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+
+        .winner-modal.active {
+            display: flex;
+        }
+
+        .winner-content {
+            background: rgba(0, 0, 0, 0.95);
             border: 3px solid #ffd700;
             border-radius: 20px;
-            padding: 40px 60px;
+            padding: 50px 80px;
             text-align: center;
-            font-size: 2em;
-            z-index: 1000;
-            animation: popUp 0.5s ease-out;
+            animation: popUp 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .winner-content h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .winner-content button {
+            margin-top: 20px;
+            max-width: 300px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         @keyframes popUp {
             from {
-                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+                transform: scale(0.5);
             }
             to {
-                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+                transform: scale(1);
             }
         }
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8em;
-            }
-
+        @media (max-width: 1200px) {
             .card {
-                width: 55px;
-                height: 85px;
+                width: 45px;
+                height: 65px;
+                font-size: 0.75em;
             }
 
-            .hand-area .card {
+            .hand-cards .card {
                 width: 50px;
-                height: 75px;
+                height: 72px;
             }
 
-            .controls button {
-                min-width: 120px;
+            .info-badge {
+                font-size: 0.85em;
+                padding: 8px 12px;
             }
+        }
+
+        @media (max-width: 800px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .opponent-area {
+                flex: none;
+                max-height: 120px;
+            }
+
+            .table-container {
+                flex: 0.5;
+            }
+        }
+
+        .error-message {
+            background: rgba(244, 67, 54, 0.2);
+            border-left-color: #f44336;
+            color: #ffb8b8;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 4px solid #f44336;
+            font-size: 0.9em;
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .hidden-element {
+            display: none !important;
         }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>🎰 Дурак Онлайн</h1>
-    <p id="status" style="font-size: 0.9em; margin-top: 5px;"></p>
-</div>
+<div class="container">
+    <div class="header">
+        <h1>🎰 Дурак Онлайн</h1>
+        <p id="status"></p>
+    </div>
 
-<div id="menu" class="menu-container">
-    <h2>Начало игры</h2>
-    <button onclick="host()">🔴 Создать комнату</button>
-    <div class="input-group">
+    <div id="menu" class="menu-container">
+        <h2>Начало игры</h2>
+        <button onclick="hostGame()">🔴 Создать комнату</button>
         <input id="room" type="text" placeholder="Введите код комнаты">
-        <button onclick="join()">🟢 Присоединиться</button>
+        <button onclick="joinGame()">🟢 Присоединиться</button>
+    </div>
+
+    <div id="gameContainer" class="game-container">
+        <div class="game-top">
+            <div class="info-badge">Козырь: <strong id="trump" style="font-size: 1.3em;">♠</strong></div>
+            <div class="status-message" id="gameStatus">Инициализация...</div>
+            <div class="deck-info">📚 Колода: <span id="deckCount">0</span></div>
+        </div>
+
+        <div class="main-content">
+            <div class="opponent-area">
+                <div class="opponent-title">👥 Противник</div>
+                <div class="opponent-cards" id="opponentCards"></div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-title">🃏 Стол</div>
+                <div class="table-cards" id="tableCards"></div>
+            </div>
+        </div>
+
+        <div class="hand-container">
+            <div class="hand-title">👤 Твои карты</div>
+            <div class="hand-cards" id="myHand"></div>
+        </div>
+
+        <div class="control-panel">
+            <button id="beatBtn" onclick="playBeat()">✅ Отбить</button>
+            <button id="takeBtn" onclick="giveUp()" class="secondary">📥 Сдаться</button>
+            <button id="attackBtn" onclick="completeAttack()" class="secondary">🎯 Завершить ход</button>
+        </div>
+
+        <div class="game-log" id="gameLog"></div>
     </div>
 </div>
 
-<div class="game-area" id="gameArea">
-    <div class="info-bar">
-        <div class="trump-display">
-            Козырь: <span id="trumpSuit">♠</span>
-        </div>
-        <div class="deck-count" id="deckInfo">
-            Карт в колоде: 0
-        </div>
-    </div>
-
-    <div id="message" class="message"></div>
-
-    <div class="table-area" id="table"></div>
-
-    <div>
-        <h3 style="text-align: center; margin-bottom: 10px;">Твои карты</h3>
-        <div class="hand-area" id="hand"></div>
-    </div>
-
-    <div class="controls">
-        <button onclick="take()">📥 Взять карты</button>
-        <button onclick="done()" class="secondary">✅ Готово / Конец хода</button>
+<div id="winnerModal" class="winner-modal">
+    <div class="winner-content">
+        <h2 id="winnerText">Победа!</h2>
+        <p id="winnerDesc"></p>
+        <button onclick="location.reload()">Играть снова</button>
     </div>
 </div>
-
-<div id="winner" class="winner-message" style="display: none;"></div>
 
 <script>
     let peer, conn, me, game;
-
+    let selectedCard = null;
     const suits = ["♠", "♥", "♦", "♣"];
     const vals = ["6", "7", "8", "9", "10", "В", "Д", "К", "Т"];
     const rank = Object.fromEntries(vals.map((v, i) => [v, i]));
 
-    function cardHTML(c, i) {
-        let isRed = c.s === "♥" || c.s === "♦";
-        let className = isRed ? "red" : "black";
-        return `
-            <div class="card ${className}" onclick="play(${i})" title="${c.v}${c.s}">
-                <div class="card-corner top-left">
-                    <div class="card-rank">${c.v}</div>
-                    <div class="card-suit">${c.s}</div>
-                </div>
-                <div style="font-size: 2em;">${c.s}</div>
-                <div class="card-corner bottom-right">
-                    <div class="card-rank">${c.v}</div>
-                    <div class="card-suit">${c.s}</div>
-                </div>
-            </div>
-        `;
-    }
+    const CARD_IMAGES = {
+        simple: true // Используем текстовое представление
+    };
 
-    function host() {
+    // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+
+    function hostGame() {
         me = 0;
         peer = new Peer();
         peer.on("open", id => {
-            document.getElementById("status").innerText = `Код комнаты: ${id} (скопировано)`;
-            navigator.clipboard.writeText(id);
+            document.getElementById("status").innerText = `Код: ${id} (скопировано)`;
+            navigator.clipboard.writeText(id).catch(e => console.log(e));
             startGame();
         });
         peer.on("connection", c => {
@@ -426,18 +559,16 @@
             conn.on("open", () => {
                 newGame();
                 send();
+                addLog("Противник присоединился!");
             });
-            conn.on("data", data => {
-                if (data.type === "play") playerMove(1, data.index);
-                if (data.type === "take") playerTake(1);
-                if (data.type === "done") endTurn();
-            });
+            conn.on("data", handleMessage);
+            conn.on("error", err => addLog("❌ Ошибка: " + err.message, true));
         });
     }
 
-    function join() {
-        const roomCode = document.getElementById("room").value.trim();
-        if (!roomCode) {
+    function joinGame() {
+        const code = document.getElementById("room").value.trim();
+        if (!code) {
             alert("Введите код комнаты!");
             return;
         }
@@ -445,17 +576,13 @@
         me = 1;
         peer = new Peer();
         peer.on("open", () => {
-            conn = peer.connect(roomCode);
-            conn.on("data", data => {
-                if (data.type === "state") {
-                    game = data.game;
-                    render();
-                }
-            });
+            conn = peer.connect(code);
             conn.on("open", () => {
-                document.getElementById("status").innerText = "✅ Подключено!";
+                document.getElementById("status").innerText = "✅ Подключено";
                 startGame();
+                addLog("Вы присоединились к игре!");
             });
+            conn.on("data", handleMessage);
             conn.on("error", err => {
                 alert("Ошибка подключения: " + err.message);
             });
@@ -463,9 +590,11 @@
     }
 
     function startGame() {
-        document.getElementById("menu").style.display = "none";
-        document.getElementById("gameArea").classList.add("active");
+        document.getElementById("menu").classList.add("hidden-element");
+        document.getElementById("gameContainer").classList.add("active");
     }
+
+    // ==================== ЛОГИКА ИГРЫ ====================
 
     function newGame() {
         let deck = [];
@@ -486,10 +615,23 @@
             turn: 0,
             defender: 1,
             phase: "attack",
-            winner: null
+            winner: null,
+            history: []
         };
 
         render();
+    }
+
+    function handleMessage(data) {
+        switch (data.type) {
+            case "state":
+                game = data.game;
+                render();
+                break;
+            case "action":
+                handleRemoteAction(data);
+                break;
+        }
     }
 
     function beats(a, b) {
@@ -498,44 +640,117 @@
         return false;
     }
 
-    function playerMove(p, i) {
-        if (game.winner !== null) return;
-        if (p !== game.turn && p !== game.defender) return;
+    function getValidRanks() {
+        let ranks = new Set();
+        game.table.forEach(x => {
+            ranks.add(x.attack.v);
+            if (x.defense) ranks.add(x.defense.v);
+        });
+        return ranks;
+    }
 
-        let card = game.hands[p][i];
+    function canAttack() {
+        if (game.table.length >= 6) return false;
+        if (game.table.length >= game.hands[game.defender].length) return false;
+        if (game.table.length === 0) return true;
 
-        if (game.phase === "attack" && p === game.turn) {
-            game.hands[p].splice(i, 1);
+        let validRanks = getValidRanks();
+        return game.hands[game.turn].some(c => validRanks.has(c.v));
+    }
+
+    function playCard(playerIdx, cardIdx, isAttack = true) {
+        if (game.winner) return;
+        if (game.table.some(x => !x.defense)) return; // Есть необработанная карта
+
+        let card = game.hands[playerIdx][cardIdx];
+        if (!card) return;
+
+        if (isAttack && playerIdx === game.turn) {
+            if (game.table.length > 0) {
+                let validRanks = getValidRanks();
+                if (!validRanks.has(card.v)) {
+                    addLog("❌ Карта не совпадает по рангу!", true);
+                    return;
+                }
+            }
+
+            game.hands[playerIdx].splice(cardIdx, 1);
             game.table.push({ attack: card, defense: null });
             game.phase = "defense";
-        } else if (game.phase === "defense" && p === game.defender) {
+            addLog(`🎯 Карта выложена: ${card.v}${card.s}`);
+
+        } else if (!isAttack && playerIdx === game.defender) {
             let pair = game.table.find(x => !x.defense);
-            if (pair && beats(card, pair.attack)) {
-                game.hands[p].splice(i, 1);
-                pair.defense = card;
-                game.phase = "attack";
-            } else {
-                alert("❌ Эта карта не бьёт!");
+            if (!pair) {
+                addLog("❌ Нет неотбитой карты!", true);
                 return;
             }
+
+            if (!beats(card, pair.attack)) {
+                addLog("❌ Карта не бьёт!", true);
+                return;
+            }
+
+            game.hands[playerIdx].splice(cardIdx, 1);
+            pair.defense = card;
+            game.phase = "attack";
+            addLog(`✅ Карта отбита: ${card.v}${card.s}`);
         }
 
-        checkWin();
+        checkAutoEnd();
         send();
         render();
     }
 
-    function play(i) {
-        if (me === 0) playerMove(0, i);
-        else conn.send({ type: "play", index: i });
+    function playBeat() {
+        if (me !== game.defender) {
+            addLog("❌ Вы не защищаетесь!", true);
+            return;
+        }
+
+        let unbeatenIdx = game.table.findIndex(x => !x.defense);
+        if (unbeatenIdx === -1) {
+            addLog("❌ Все карты отбиты!", true);
+            return;
+        }
+
+        for (let i = 0; i < game.hands[me].length; i++) {
+            if (beats(game.hands[me][i], game.table[unbeatenIdx].attack)) {
+                playCard(me, i, false);
+                return;
+            }
+        }
+
+        addLog("❌ Нет подходящих карт для защиты!", true);
     }
 
-    function playerTake(p) {
-        if (p !== game.defender) return;
+    function giveUp() {
+        if (game.defender !== me) {
+            addLog("❌ Вы не защищаетесь!", true);
+            return;
+        }
 
+        takeAllCards(me);
+    }
+
+    function completeAttack() {
+        if (game.turn !== me) {
+            addLog("❌ Не ваш ход!", true);
+            return;
+        }
+
+        if (game.table.some(x => !x.defense)) {
+            addLog("❌ Противник не отбил все карты!", true);
+            return;
+        }
+
+        endRound();
+    }
+
+    function takeAllCards(playerIdx) {
         game.table.forEach(x => {
-            game.hands[p].push(x.attack);
-            if (x.defense) game.hands[p].push(x.defense);
+            game.hands[playerIdx].push(x.attack);
+            if (x.defense) game.hands[playerIdx].push(x.defense);
         });
 
         game.table = [];
@@ -544,26 +759,13 @@
         game.defender = 1 - game.turn;
         game.phase = "attack";
 
+        addLog(`📥 Игрок ${playerIdx === me ? "вы" : "противник"} взял карты!`);
+        checkWin();
         send();
         render();
     }
 
-    function take() {
-        if (me === 0) playerTake(0);
-        else conn.send({ type: "take" });
-    }
-
-    function done() {
-        if (game.table.some(x => !x.defense)) {
-            alert("⚠️ Не все карты отбиты!");
-            return;
-        }
-
-        if (me === 0) endTurn();
-        else conn.send({ type: "done" });
-    }
-
-    function endTurn() {
+    function endRound() {
         game.table = [];
         drawCards();
 
@@ -571,9 +773,21 @@
         game.defender = 1 - game.turn;
         game.phase = "attack";
 
+        addLog("🔄 Раунд завершен!");
         checkWin();
         send();
         render();
+    }
+
+    function checkAutoEnd() {
+        if (game.table.every(x => x.defense)) {
+            if (!canAttack()) {
+                setTimeout(() => {
+                    addLog("⏱️ Ход завершен автоматически");
+                    endRound();
+                }, 500);
+            }
+        }
     }
 
     function drawCards() {
@@ -588,68 +802,156 @@
         for (let p = 0; p < 2; p++) {
             if (game.hands[p].length === 0 && game.deck.length === 0) {
                 game.winner = p;
+                showWinner();
             }
         }
     }
 
-    function send() {
-        if (conn && conn.open) conn.send({ type: "state", game });
+    // ==================== UI ====================
+
+    function renderCard(card, idx, clickable = false, isBack = false) {
+        if (isBack) {
+            return `<div class="card-back">🂠</div>`;
+        }
+
+        let isRed = card.s === "♥" || card.s === "♦";
+        let className = isRed ? "red" : "black";
+        let onClick = clickable ? `onclick="playCard(${me}, ${idx}, true)"` : "";
+
+        return `
+            <div class="card ${className}" ${onClick} style="${clickable ? 'cursor: pointer;' : 'cursor: default;'}">
+                <div class="card-corner">${card.v}</div>
+                <div class="card-suit">${card.s}</div>
+                <div class="card-corner">${card.v}</div>
+            </div>
+        `;
+    }
+
+    function renderTableCard(card, isAttack = true) {
+        let isRed = card.s === "♥" || card.s === "♦";
+        let className = isRed ? "red" : "black";
+
+        return `
+            <div class="card ${className}">
+                <div class="card-corner">${card.v}</div>
+                <div class="card-suit">${card.s}</div>
+                <div class="card-corner">${card.v}</div>
+            </div>
+        `;
     }
 
     function render() {
         if (!game) return;
 
-        // Обновляем статус
+        // Статус
+        let status = "";
         if (game.winner !== null) {
-            const winnerMsg = document.getElementById("winner");
-            const message = game.winner === me ? "🎉 ТЫ ПОБЕДИЛ! 🎉" : "😢 Ты проиграл!";
-            winnerMsg.innerHTML = message;
-            winnerMsg.style.display = "block";
-            document.getElementById("status").innerText = message;
+            status = game.winner === me ? "🎉 ВЫ ПОБЕДИЛИ!" : "😢 Вы проиграли";
+        } else if (game.turn === me && game.defender === me) {
+            status = "⚙️ Ошибка состояния";
+        } else if (game.turn === me) {
+            status = `🎯 Ваш ход (атака) | Фаза: ${game.phase === "attack" ? "выложи карту" : "жди защиты"}`;
+        } else if (game.defender === me) {
+            status = `🛡️ Вы защищаетесь | Фаза: ${game.phase === "defense" ? "отбей карту" : "жди атаки"}`;
         } else {
-            document.getElementById("winner").style.display = "none";
-            let statusText = "";
-            if (game.turn === me) {
-                statusText = "🔴 Твой ход (атака)";
-            } else if (game.defender === me) {
-                statusText = "🟡 Ты отбиваешься (защита)";
-            } else {
-                statusText = "🔵 Ход противника";
-            }
-            document.getElementById("status").innerText = statusText;
+            status = "⏳ Ход противника";
         }
-
-        // Сообщение о фазе
-        let phaseMsg = "";
-        if (game.phase === "attack") {
-            phaseMsg = me === game.turn ? "Выложите карту" : "Ожидание карты";
-        } else if (game.phase === "defense") {
-            phaseMsg = me === game.defender ? "Отбейте карту" : "Ожидание защиты";
-        }
-        document.getElementById("message").innerText = phaseMsg;
+        document.getElementById("gameStatus").innerHTML = status;
 
         // Козырь и колода
-        document.getElementById("trumpSuit").innerText = game.trump;
-        document.getElementById("deckInfo").innerHTML = `🃏 Карт в колоде: <strong>${game.deck.length}</strong>`;
+        document.getElementById("trump").innerText = game.trump;
+        document.getElementById("deckCount").innerText = game.deck.length;
 
-        // Рука
-        document.getElementById("hand").innerHTML =
-            game.hands[me].map(cardHTML).join("") || "<p style='color: #b0e0e6;'>Карт нет</p>";
+        // Противник (карты рубашкой)
+        document.getElementById("opponentCards").innerHTML = game.hands[1 - me]
+            .map(() => renderCard(null, 0, false, true))
+            .join("");
 
         // Стол
-        document.getElementById("table").innerHTML =
-            game.table.length === 0
-                ? "<p style='color: #b0e0e6; margin: auto;'>Стол пуст</p>"
-                : game.table.map(x => {
-                    let d = x.defense ? cardHTML(x.defense, -1) : "<div style='opacity: 0.5; padding: 20px;'>?</div>";
-                    return `
-                        <div class="card-pair">
-                            ${cardHTML(x.attack, -1)}
-                            <span style="font-size: 1.5em; color: #b0e0e6;">→</span>
-                            ${d}
-                        </div>
-                    `;
-                }).join("");
+        if (game.table.length === 0) {
+            document.getElementById("tableCards").innerHTML = '<div style="color: #b0e0e6; font-size: 1.2em;">Пусто</div>';
+        } else {
+            document.getElementById("tableCards").innerHTML = game.table.map((pair, idx) => {
+                let beaten = pair.defense !== null;
+                return `
+                    <div class="card-pair ${beaten ? "beaten" : ""}">
+                        ${renderTableCard(pair.attack, true)}
+                        <span style="color: #b0e0e6; font-weight: bold;">${beaten ? "✓" : "→"}</span>
+                        ${pair.defense ? renderTableCard(pair.defense, false) : '<div class="card-back-table">?</div>'}
+                    </div>
+                `;
+            }).join("");
+        }
+
+        // Рука
+        document.getElementById("myHand").innerHTML = game.hands[me]
+            .map((card, idx) => renderCard(card, idx, true, false))
+            .join("") || '<div style="color: #b0e0e6;">Карт нет</div>';
+
+        // Кнопки
+        updateButtons();
+    }
+
+    function updateButtons() {
+        const beatBtn = document.getElementById("beatBtn");
+        const takeBtn = document.getElementById("takeBtn");
+        const attackBtn = document.getElementById("attackBtn");
+
+        beatBtn.disabled = true;
+        takeBtn.disabled = true;
+        attackBtn.disabled = true;
+
+        if (game.winner) {
+            beatBtn.disabled = true;
+            takeBtn.disabled = true;
+            attackBtn.disabled = true;
+            return;
+        }
+
+        if (game.defender === me) {
+            beatBtn.disabled = false;
+            takeBtn.disabled = false;
+        }
+
+        if (game.turn === me && game.table.every(x => x.defense)) {
+            attackBtn.disabled = false;
+        }
+    }
+
+    function send() {
+        if (conn && conn.open) {
+            conn.send({ type: "state", game });
+        }
+    }
+
+    function addLog(msg, isError = false) {
+        const log = document.getElementById("gameLog");
+        const entry = document.createElement("div");
+        entry.className = isError ? "log-entry error-message" : "log-entry";
+        entry.innerText = msg;
+        log.appendChild(entry);
+        log.scrollTop = log.scrollHeight;
+
+        // Сохраняем последние 10 сообщений
+        while (log.children.length > 10) {
+            log.removeChild(log.children[0]);
+        }
+    }
+
+    function showWinner() {
+        const modal = document.getElementById("winnerModal");
+        const text = document.getElementById("winnerText");
+        const desc = document.getElementById("winnerDesc");
+
+        if (game.winner === me) {
+            text.innerHTML = "🎉 ВЫ ПОБЕДИЛИ! 🎉";
+            desc.innerHTML = "Поздравляем! Вы выиграли раунд!";
+        } else {
+            text.innerHTML = "😢 Вы проиграли";
+            desc.innerHTML = "Противник закончил колоду первым";
+        }
+
+        modal.classList.add("active");
     }
 
     render();
